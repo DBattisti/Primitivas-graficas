@@ -11,7 +11,7 @@ run: graphProgram
 build: clean graphProgram
 
 clean:
-	rm -f *.o
+	rm -f graphProgram
 
 graphProgram: $(PRIMITIVES) graphProgram.c
 	$(GCC) graphProgram $(PRIMITIVES) graphProgram.c $(LINKS)
