@@ -3,8 +3,8 @@
 #include <stdlib.h>
 #include <math.h>
 
-#define WINDOW_WIDHT 500
-#define WINDOW_HEIGHT 500
+#define WINDOW_WIDHT 600
+#define WINDOW_HEIGHT 600
 #define CONT_COLOR 5
 
 int interative = 1; //0 = false 1 = true
