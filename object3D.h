@@ -1,5 +1,5 @@
-typedef struct graph {
-	int **points; //Coordenadas x, y, z de cada ponto
+typedef struct {
+	float **points; //Coordenadas x, y, z de cada ponto
 	int **lines; //Indice do primeiro e ultimo ponto da linha
 	int cent[3]; // Coordenadas x, y e z para projecao no sist de referencia do universo
 	int ang[3]; //Angulos de rotacao nas coordenadas x, y e z

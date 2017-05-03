@@ -115,7 +115,7 @@ void createLineMtr(float x1, float y1, float x2, float y2, int idColor){
 	}
 }
 
-void printMtr (){
+void printMtrDisplay (){
 	int idColor;
 	for (int i = 0; i < WINDOW_HEIGHT; i++) {
 		for (int j = 0; j < WINDOW_WIDHT; j++) {
@@ -123,6 +123,14 @@ void printMtr (){
 				idColor = MTR[i][j];
 				putPixel(i,j,idColor);
 			}
+		}
+	}
+}
+
+void clearMtrDisplay (){
+	for (int i = 0; i < WINDOW_HEIGHT; i++) {
+		for (int j = 0; j < WINDOW_WIDHT; j++) {
+			MTR[i][j] = 0;
 		}
 	}
 }
@@ -138,7 +146,7 @@ void fill (int xc, int yc, int idColor){
 	MTR[xc][yc] = idColor;
 
 	if (interative){
-		printMtr();
+		printMtrDisplay();
 		glFlush();
 		// delay();
 	}
