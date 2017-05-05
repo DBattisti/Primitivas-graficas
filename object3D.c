@@ -15,7 +15,7 @@ typedef struct  {
 	int **lines; //Indice do primeiro e ultimo ponto da linha
 	int* trans; // Coordenadas x, y e z para projecao no sist de referencia do universo
 	int* ang; //Angulos de rotacao nas coordenadas x, y e z
-	int* scale; //Escala do objeto, x, y e z
+	float* scale; //Escala do objeto, x, y e z
 	int p, l; //qnt de pontos e linhas
 }graphObject;
 
@@ -25,7 +25,7 @@ graphObject* newObject(int n_points, int m_lines){
 	obj->l = m_lines;
 
 	// Tres arrays de informações
-	obj->scale = malloc (sizeof(int)*3);
+	obj->scale = malloc (sizeof(float)*3);
 	obj->ang = malloc (sizeof(int)*3);
 	obj->trans = malloc (sizeof(int)*3);
 
@@ -79,9 +79,32 @@ void printMtr (int linha, int coluna, int** mtr){
 	}
 }
 
+void printMtrFloat (int linha, int coluna, float** mtr){
+	printf("\t");
+	for (size_t i = 0; i < coluna; i++) {
+		printf("[%d]\t",i);
+	}
+	printf("\n");
+	for (size_t j = 0; j < linha; j++) {
+		printf("[%d]\t",j);
+		for (size_t i = 0; i < coluna; i++) {
+			printf(" %.1f\t",mtr[j][i]);
+		}
+		printf("\n");
+	}
+}
+
+
 void printArray (int size, int array[size]){
 	for (size_t i = 0; i < size; i++) {
 		printf("%d\t",array[i]);
+	}
+	printf("\n");
+}
+
+void printArrayFloat (int size, float array[size]){
+	for (size_t i = 0; i < size; i++) {
+		printf("%.1f\t",array[i]);
 	}
 	printf("\n");
 }
@@ -124,6 +147,10 @@ void printObjectInfo (graphObject* obj){
 	printf("Quantidade de linhas: %d\n",obj->l);
 	printf("Angulos rotacionados em x, y e z:\n");
 	printArray(3,obj->ang);
+	printf("Valores transladados em x, y e z:\n");
+	printArray(3,obj->trans);
+	printf("Valores escalados em x, y e z:\n");
+	printArrayFloat(3,obj->scale);
 	printf("Matriz de pontos:\n");
 	printMtrFloat(obj->p,NUM_COL_P,obj->points);
 	printf("Matriz de linhas:\n");
@@ -165,20 +192,6 @@ graphObject* moveCenter(graphObject* obj, int center){
 	return obj;
 }
 
-void printMtrFloat (int linha, int coluna, float mtr[][coluna]){
-	printf("\t");
-	for (size_t i = 0; i < coluna; i++) {
-		printf("[%d]\t",i);
-	}
-	printf("\n");
-	for (size_t j = 0; j < linha; j++) {
-		printf("[%d]\t",j);
-		for (size_t i = 0; i < coluna; i++) {
-			printf(" %.3f\t",mtr[j][i]);
-		}
-		printf("\n");
-	}
-}
 
 void matrixMult (graphObject* obj, float mtr[][3]){
 	float x,y,z;
@@ -224,15 +237,15 @@ void rotateZ(graphObject* obj, int angle){
 	matrixMult(obj,rotateMtr);
 }
 
-void scaleX(graphObject* obj, float scale){
+void scaleX(graphObject* obj, double scale){
 	obj->scale[0] += scale;
-	float scaleMtr[3][3] = {scale,  0, 0,
+	float scaleMtr[3][3] = { scale,  0, 0,
 												 	 0, 		1, 0,
 												 	 0,			0, 1 };
  	matrixMult(obj,scaleMtr);
 }
 
-void scaleY(graphObject* obj, float scale){
+void scaleY(graphObject* obj, double scale){
 	obj->scale[1] += scale;
 	float scaleMtr[3][3] = {1, 0, 		0,
 												 	0, scale, 0,
@@ -240,7 +253,7 @@ void scaleY(graphObject* obj, float scale){
  	matrixMult(obj,scaleMtr);
 }
 
-void scaleZ(graphObject* obj, float scale){
+void scaleZ(graphObject* obj, double scale){
 	obj->scale[2] += scale;
 	float scaleMtr[3][3] = { 1, 0, 0,
 												 	 0,	1, 0,

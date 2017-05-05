@@ -6,7 +6,7 @@
 #include "../graphicPrimitives.h"
 
 #define ANGLE_SPEED 1
-#define SCALE_SPEED 2
+#define SCALE_SPEED 1.1
 #define TRANS_SPEED 5
 
 enum MENU_TYPE{
@@ -135,7 +135,7 @@ int main (int argc, char *argv[]){
    win = glutCreateWindow("Criacao de objetos 3D");
 
    glutCreateMenu(menu);
-   glutAddMenuEntry("Preencher",MENU_PRINT);
+   glutAddMenuEntry("Info",MENU_PRINT);
    glutAddMenuEntry("Refresh",MENU_CLEAN);
    glutAddMenuEntry("Sair",MENU_EXIT);
    glutAttachMenu(GLUT_RIGHT_BUTTON);
