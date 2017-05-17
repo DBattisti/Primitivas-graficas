@@ -3,7 +3,7 @@
 #include <math.h>
 #include "graphicPrimitives.h"
 
-#define NUM_COL_P 3
+#define NUM_COL_P 4
 #define NUM_COL_L 2
 
 #define PI 3.14159265
@@ -113,14 +113,14 @@ void printArrayFloat (int size, float array[size]){
 graphObject* newCube (){
 	graphObject* cube = newObject(8,12);
 
-	cube->points[0][0] =  1.0; cube->points[0][1] =  1.0; cube->points[0][2] =  1.0;//p3
-	cube->points[1][0] =  1.0; cube->points[1][1] =  1.0; cube->points[1][2] = -1.0;//p6
-	cube->points[2][0] =  1.0; cube->points[2][1] = -1.0; cube->points[2][2] =  1.0;//p2
-	cube->points[3][0] =  1.0; cube->points[3][1] = -1.0; cube->points[3][2] = -1.0;//p7
-	cube->points[4][0] = -1.0; cube->points[4][1] =  1.0; cube->points[4][2] =  1.0;//p4
-	cube->points[5][0] = -1.0; cube->points[5][1] =  1.0; cube->points[5][2] = -1.0;//p5
-	cube->points[6][0] = -1.0; cube->points[6][1] = -1.0; cube->points[6][2] =  1.0;//p1
-	cube->points[7][0] = -1.0; cube->points[7][1] = -1.0; cube->points[7][2] = -1.0;//p8
+	cube->points[0][0] =  1.0f; cube->points[0][1] =  1.0f; cube->points[0][2] =  1.0f; cube->points[0][3] = 1.0f;//p3
+	cube->points[1][0] =  1.0f; cube->points[1][1] =  1.0f; cube->points[1][2] = -1.0f; cube->points[1][3] = 1.0f;//p6
+	cube->points[2][0] =  1.0f; cube->points[2][1] = -1.0f; cube->points[2][2] =  1.0f; cube->points[2][3] = 1.0f;//p2
+	cube->points[3][0] =  1.0f; cube->points[3][1] = -1.0f; cube->points[3][2] = -1.0f; cube->points[3][3] = 1.0f;//p7
+	cube->points[4][0] = -1.0f; cube->points[4][1] =  1.0f; cube->points[4][2] =  1.0f; cube->points[4][3] = 1.0f;//p4
+	cube->points[5][0] = -1.0f; cube->points[5][1] =  1.0f; cube->points[5][2] = -1.0f; cube->points[5][3] = 1.0f;//p5
+	cube->points[6][0] = -1.0f; cube->points[6][1] = -1.0f; cube->points[6][2] =  1.0f; cube->points[6][3] = 1.0f;//p1
+	cube->points[7][0] = -1.0f; cube->points[7][1] = -1.0f; cube->points[7][2] = -1.0f; cube->points[7][3] = 1.0f;//p8
 
 	//face frente
 	cube->lines [0][0] = 6; cube->lines [0][1] = 2;
@@ -172,130 +172,165 @@ graphObject* copyObject (graphObject* orig){
 	return copy;
 }
 
-//O objeto deve estar na origem para poder escalar o tamanho dele
-graphObject* scaleObject(graphObject* obj, int scale){
-	for (size_t i = 0; i < obj->p; i++) {
-		for (size_t j = 0; j < NUM_COL_P; j++) {
-			obj->points[i][j] *= scale;
-		}
-	}
-	return obj;
-}
-
-//O objeto deve estar na origem para poder escalar o tamanho dele
-graphObject* moveCenter(graphObject* obj, int center){
-	for (size_t i = 0; i < obj->p; i++) {
-		for (size_t j = 0; j < NUM_COL_P; j++) {
-			obj->points[i][j] += center;
-		}
-	}
-	return obj;
-}
-
-
-void matrixMult (graphObject* obj, float mtr[][3]){
-	float x,y,z;
+void matrixMult (graphObject* obj, float mtr[][4]){
+	float x,y,z,m;
 	for (size_t i = 0; i < obj->p; i++) {
 		x = obj->points[i][0];
 		y = obj->points[i][1];
 		z = obj->points[i][2];
-		obj->points[i][0] = x * mtr[0][0] + y * mtr[1][0] + z * mtr[2][0];
-		obj->points[i][1] = x * mtr[0][1] + y * mtr[1][1] + z * mtr[2][1];
-		obj->points[i][2] = x * mtr[0][2] + y * mtr[1][2] + z * mtr[2][2];
+		m = obj->points[i][3];
+		obj->points[i][0] =  x * mtr[0][0] + y * mtr[1][0] + z * mtr[2][0] + m * mtr[3][0];
+		obj->points[i][1] =  x * mtr[0][1] + y * mtr[1][1] + z * mtr[2][1] + m * mtr[3][1];
+		obj->points[i][2] =  x * mtr[0][2] + y * mtr[1][2] + z * mtr[2][2] + m * mtr[3][2];
+		obj->points[i][3] =  x * mtr[0][3] + y * mtr[1][3] + z * mtr[2][3] + m * mtr[3][3];
 	}
 }
 
-void matrixSum (graphObject* obj, int mtr[3]){
-	for (size_t i = 0; i < obj->p; i++) {
-		obj->points[i][0] += mtr[0];
-		obj->points[i][1] += mtr[1];
-		obj->points[i][2] += mtr[2];
-	}
-}
-
-void rotateX(graphObject* obj, int angle){
+void rotateX(graphObject* obj, float angle){
 	obj->ang[0] += angle;
-	float rotateMtr[3][3] = {1, 0, 						 			0,
-												 	 0, cos(angle*GTOR), 	 	sin(angle*GTOR),
-												 	 0,	sin(angle*GTOR)*-1, cos(angle*GTOR) };
+	float rotateMtr[4][4] = {1, 0, 						 			0,								0,
+												 	 0, cos(angle*GTOR), 	 	sin(angle*GTOR),	0,
+												 	 0,	sin(angle*GTOR)*-1, cos(angle*GTOR),	0,
+													 0,	0,									0,								1};
  	matrixMult(obj,rotateMtr);
 }
 
-void rotateY(graphObject* obj, int angle){
+void rotateY(graphObject* obj, float angle){
 	obj->ang[1] += angle;
-	float rotateMtr[3][3] = {cos(angle*GTOR), 0, 	sin(angle*GTOR)*-1,
-												 	 0, 							1,	0,
-												 	 sin(angle*GTOR),	0,	cos(angle*GTOR) };
+	float rotateMtr[4][4] = {cos(angle*GTOR), 0, 	sin(angle*GTOR)*-1,	0,
+												 	 0, 							1,	0,									0,
+												 	 sin(angle*GTOR),	0,	cos(angle*GTOR),		0,
+													 0,								0,	0,									1};
  	matrixMult(obj,rotateMtr);
 }
 
-void rotateZ(graphObject* obj, int angle){
+void rotateZ(graphObject* obj, float angle){
 	obj->ang[2] += angle;
-	float rotateMtr[3][3] = {cos(angle*GTOR), 		sin(angle*GTOR), 	0,
-									 			 	 sin(angle*GTOR)*-1, 	cos(angle*GTOR), 	0,
-									 		 	 	 0,										0,								1	};
+	float rotateMtr[4][4] = {cos(angle*GTOR), 		sin(angle*GTOR), 	0,	0,
+									 			 	 sin(angle*GTOR)*-1, 	cos(angle*GTOR), 	0,	0,
+									 		 	 	 0,										0,								1,	0,
+													 0,										0,								0,	1};
 	matrixMult(obj,rotateMtr);
 }
 
-void scaleX(graphObject* obj, double scale){
+void scaleX(graphObject* obj, float scale){
 	obj->scale[0] += scale;
-	float scaleMtr[3][3] = { scale,  0, 0,
-												 	 0, 		1, 0,
-												 	 0,			0, 1 };
+	float scaleMtr[4][4] = { scale, 0, 0, 0,
+												 	 0, 		1, 0, 0,
+												 	 0,			0, 1, 0,
+													 0,			0, 0, 1};
  	matrixMult(obj,scaleMtr);
 }
 
-void scaleY(graphObject* obj, double scale){
+void scaleY(graphObject* obj, float scale){
 	obj->scale[1] += scale;
-	float scaleMtr[3][3] = {1, 0, 		0,
-												 	0, scale, 0,
-												 	0, 0, 		1 };
+	float scaleMtr[4][4] = { 1, 0, 		0, 0,
+												 	 0,	scale,0, 0,
+												 	 0,	0,  	1, 0,
+													 0,	0, 		0, 1};
  	matrixMult(obj,scaleMtr);
 }
 
-void scaleZ(graphObject* obj, double scale){
+void scaleZ(graphObject* obj, float scale){
 	obj->scale[2] += scale;
-	float scaleMtr[3][3] = { 1, 0, 0,
-												 	 0,	1, 0,
-												 	 0,	0, scale };
+	float scaleMtr[4][4] = { 1, 0, 0,			0,
+												 	 0,	1, 0,			0,
+												 	 0,	0, scale,	0,
+													 0,	0, 0,			1};
  	matrixMult(obj,scaleMtr);
 }
 
 void transX(graphObject* obj, int trans){
 	obj->trans[0] += trans;
-	int transMtr[3] = {trans, 0, 0};
- 	matrixSum(obj,transMtr);
+	float transMtr[4][4] = {1, 			0, 	0,	0,
+													0,			1, 	0,	0,
+													0, 			0,	1,	0,
+													trans,	0, 	0,	1};
+ 	matrixMult(obj,transMtr);
 }
 
 void transY(graphObject* obj, int trans){
 	obj->trans[1] += trans;
-	int transMtr[3] = {0, trans, 0};
- 	matrixSum(obj,transMtr);
+	float transMtr[4][4] = {1, 	0, 			0,	0,
+													0,	1, 			0,	0,
+													0, 	0,			1,	0,
+													0,	trans, 	0,	1};
+ 	matrixMult(obj,transMtr);
 }
 
 void transZ(graphObject* obj, int trans){
 	obj->trans[2] += trans;
-	int transMtr[3] = {0, 0, trans};
- 	matrixSum(obj,transMtr);
+	float transMtr[4][4] = {1, 	0, 	0,			0,
+													0,	1, 	0,			0,
+													0, 	0,	1,			0,
+													0,	0, 	trans,	1};
+ 	matrixMult(obj,transMtr);
 }
 
+void scaleObject(graphObject* obj, float scale){
+	scaleX(obj,scale);
+	scaleY(obj,scale);
+	scaleZ(obj,scale);
+}
 
-void showLinesCube (graphObject* cube){
-	int xi, yi, zi, xj, yj, zj;
-	float x1, y1, x2, y2;
+void moveCenter(graphObject* obj, int center){
+	transX(obj,center);
+	transY(obj,center);
+}
+
+void cavaleira_proj (graphObject* obj){
+	float alfa = 0.707;
+	float cavMtr[4][4] = {1, 		0, 		0,	0,
+												0,		1, 		0,	0,
+												alfa, alfa,	0,	0,
+												0,		0, 		0,	1};
+	matrixMult(obj,cavMtr);
+}
+
+void cabinet_proj (graphObject* obj){
 	float alfa = 0.707/2;
+	float cabMtr[4][4] = {1, 		0, 		0,	0,
+										 		0,		1, 		0,	0,
+									 	 		alfa, alfa,	0,	0,
+												0,		0, 		0,	1};
+	matrixMult(obj,cabMtr);
+}
+
+void orto_proj (graphObject* obj){
+	float ortoMtr[4][4] = {1,	0,	0,	0,
+										 		0,	1,	0, 	0,
+									 	 		0, 	0,	0, 	0,
+												0,	0,	0,	1};
+	matrixMult(obj,ortoMtr);
+}
+
+void persp1_proj (graphObject* obj){
+	float fz = -100.0;
+	float perspMtr[4][4] = {1,	0,	0,	0,
+										 			0,	1,	0,	0,
+									 	 			0,	0,	1,	-1/fz,
+													0,	0,	0,	1};
+	matrixMult(obj,perspMtr);
+}
+
+void persp2_proj (graphObject* obj){
+	float fz = -100.0;
+	float fx = -100.0;
+	float perspMtr[4][4] = {1,	0,	0,	-1/fx,
+										 			0,	1,	0,	0,
+									 	 			0,	0,	1,	-1/fz,
+													0,	0,	0,	1};
+	matrixMult(obj,perspMtr);
+}
+
+void showLinesCube (graphObject* obj){
+	float x1, y1, x2, y2;
 	int idColor = 1;
-	for (size_t j = 0; j < cube->l; j++) {
-		xi = cube->points[ cube->lines[j][0] ][0];
-		yi = cube->points[ cube->lines[j][0] ][1];
-		zi = cube->points[ cube->lines[j][0] ][2];
-		xj = cube->points[ cube->lines[j][1] ][0];
-		yj = cube->points[ cube->lines[j][1] ][1];
-		zj = cube->points[ cube->lines[j][1] ][2];
-		x1 = xi + alfa*zi;
-		x2 = xj + alfa*zj;
-		y1 = yi + alfa*zi;
-		y2 = yj + alfa*zj;
+	for (size_t j = 0; j < obj->l; j++) {
+		x1 = (obj->points[ obj->lines[j][0] ][0])/obj->points[ obj->lines[j][0] ][3];
+		y1 = (obj->points[ obj->lines[j][0] ][1])/obj->points[ obj->lines[j][0] ][3];
+		x2 = (obj->points[ obj->lines[j][1] ][0])/obj->points[ obj->lines[j][1] ][3];
+		y2 = (obj->points[ obj->lines[j][1] ][1])/obj->points[ obj->lines[j][1] ][3];
 		createLineMtr(x1,y1,x2,y2,idColor);
 	}
 }

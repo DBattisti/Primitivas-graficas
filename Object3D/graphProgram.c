@@ -1,11 +1,11 @@
+#include <GL/gl.h>
 #include <GL/glut.h>
+#include <GL/glu.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
 #include "../object3D.h"
 #include "../graphicPrimitives.h"
 
-#define ANGLE_SPEED 1
+#define ANGLE_SPEED 5
 #define SCALE_SPEED 1.1
 #define TRANS_SPEED 5
 
@@ -13,41 +13,73 @@ enum MENU_TYPE{
         MENU_EXIT,
         MENU_CLEAN,
         MENU_PRINT,
+        MENU_ORTO,
+        MENU_CAVALEIRA,
+        MENU_CABINET,
+        MENU_PERSP1,
+        MENU_PERSP2
 };
 
-int win;
+int funcProj;
+int win, main_menu, proj_menu;
 graphObject* orig;
 graphObject* copy;
 
 void setup(){
    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
    gluOrtho2D(0, 599, 0, 599);
-
    orig = newCube();
-   scaleObject(orig,50);
+   scaleObject(orig,50.0f);
+   funcProj = MENU_CAVALEIRA;
+}
+
+void proj (){
+  copy = copyObject(orig);
+  switch (funcProj) {
+    case MENU_CAVALEIRA:
+      cavaleira_proj(copy);
+      break;
+    case MENU_CABINET:
+      cabinet_proj(copy);
+      break;
+    case MENU_ORTO:
+      orto_proj(copy);
+      break;
+    case MENU_PERSP1:
+      transZ(copy,50);
+      persp1_proj(copy);
+      break;
+    case MENU_PERSP2:
+      transZ(copy,50);
+      transX(copy,50);
+      persp2_proj(copy);
+      break;
+  }
+  moveCenter(copy,250);
+  showLinesCube(copy);
+  destroyObject(copy);
 }
 
 void display()
 {
+  glClear(GL_COLOR_BUFFER_BIT);
   glColor3f(0.0f, 0.0f, 0.0f);
-	glClear(GL_COLOR_BUFFER_BIT);
 
   createLine(300.0,0.0,300.0,600.0,2);
   createLine(0.0,300.0,600.0,300.0,2);
 
   clearMtrDisplay();
-
-  copy = copyObject(orig);
-  moveCenter(copy,175);
-  showLinesCube(copy);
-  destroyObject(copy);
-
+  proj();
   printMtrDisplay();
-
-  glFlush();
+  glutSwapBuffers();
 }
 
-void menu (int item_menu){
+void projChoose (int item_proj){
+  funcProj = item_proj;
+  glutPostRedisplay();
+}
+
+void choose (int item_menu){
     switch (item_menu) {
       case MENU_EXIT:
         glutDestroyWindow(win);
@@ -122,28 +154,34 @@ void transformations (unsigned char key,int x, int y){
     case '3':
       transZ(orig,-TRANS_SPEED);
       break;
-
   }
   glutPostRedisplay();
 }
 
-int main (int argc, char *argv[]){
+void main (int argc, char *argv[]){
    glutInit(&argc, argv);
-   glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
+   glutInitDisplayMode(GLUT_DOUBLE);
    glutInitWindowSize(600,600);
 
    win = glutCreateWindow("Criacao de objetos 3D");
 
-   glutCreateMenu(menu);
+   proj_menu = glutCreateMenu(projChoose);
+   glutAddMenuEntry("Paralela Ortografica Multiplas Vistas",MENU_ORTO);
+   glutAddMenuEntry("Paralela Obliqua Cavaleira",MENU_CAVALEIRA);
+   glutAddMenuEntry("Paralela Obliqua Cabinet",MENU_CABINET);
+   glutAddMenuEntry("Perspectiva com um ponto de fuga em Z",MENU_PERSP1);
+   glutAddMenuEntry("Perspectiva com dois pontos de fuga, em X e Z",MENU_PERSP2);
+
+   main_menu = glutCreateMenu(choose);
+   glutAddSubMenu("Projecoes",proj_menu);
    glutAddMenuEntry("Info",MENU_PRINT);
    glutAddMenuEntry("Refresh",MENU_CLEAN);
    glutAddMenuEntry("Sair",MENU_EXIT);
+
    glutAttachMenu(GLUT_RIGHT_BUTTON);
    glutKeyboardFunc(transformations);
+
    setup();
    glutDisplayFunc(display);
-
    glutMainLoop();
-
-   return 0;
 }

@@ -25,32 +25,40 @@ void printObjectInfo (graphObject* obj);
 
 graphObject* copyObject (graphObject* orig);
 
-//O objeto deve estar na origem para poder escalar o tamanho dele
-graphObject* scaleObject(graphObject* obj, int scale);
-
-//O objeto deve estar na origem para poder escalar o tamanho dele
-graphObject* moveCenter(graphObject* obj, int center);
-
 void matrixMult (graphObject* obj, float mtr[][3]);
 
 void matrixSum (graphObject* obj, int mtr[3]);
 
-void rotateX(graphObject* obj, int angle);
+void rotateX(graphObject* obj, float angle);
 
-void rotateY(graphObject* obj, int angle);
+void rotateY(graphObject* obj, float angle);
 
-void rotateZ(graphObject* obj, int angle);
+void rotateZ(graphObject* obj, float angle);
 
-void scaleX(graphObject* obj, double scale);
+void scaleX(graphObject* obj, float scale);
 
-void scaleY(graphObject* obj, double scale);
+void scaleY(graphObject* obj, float scale);
 
-void scaleZ(graphObject* obj, double scale);
+void scaleZ(graphObject* obj, float scale);
 
 void transX(graphObject* obj, int trans);
 
 void transY(graphObject* obj, int trans);
 
 void transZ(graphObject* obj, int trans);
+
+graphObject* scaleObject(graphObject* obj, float scale);
+
+graphObject* moveCenter(graphObject* obj, int center);
+
+void cavaleira_proj (graphObject* obj);
+
+void cabinet_proj (graphObject* obj);
+
+void orto_proj (graphObject* obj);
+
+void persp1_proj (graphObject* obj);
+
+void persp2_proj (graphObject* obj);
 
 void showLinesCube (graphObject* cube);

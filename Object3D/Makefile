@@ -6,7 +6,7 @@ PRIMITIVES = ../object3D.c ../graphicPrimitives.c
 all: graphProgram
 
 run: graphProgram
-	./graphProgram
+	./graphProgram -gldebug
 
 build: clean graphProgram
 
